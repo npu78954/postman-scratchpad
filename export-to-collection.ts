@@ -2,14 +2,41 @@ import * as fs from 'fs';
 import * as YAML from 'yaml';
 
 import {Utilities} from './lib/Utilities';
-import  {PCollection} from './lib/PostmanModels';
-import  {SCollection} from './lib/ScratchPadModels';
+import {PCollection} from './lib/PostmanModels';
+import {SCollection} from './lib/ScratchPadModels';
 
 const utils = new Utilities();
 
 main(process.argv);
 
 function main(args:string[]) {
+
+  let inputFolder: string = loadInputFolderParameter(args);
+  let outputCollection: string = loadOutputCollectionParameter(args);
+
+  let scratchPadCollection  = loadScratchPadCollection(inputFolder);
+  let postmanCollection: PCollection = {};
+
+  populateInfo(postmanCollection, scratchPadCollection);
+  populateAuth(postmanCollection, scratchPadCollection);
+  populateEvents(postmanCollection, scratchPadCollection);
+  populateVariables(postmanCollection, scratchPadCollection);
+  saveCollection(outputCollection, postmanCollection);
+
+  console.log("DONE")
+}
+
+function loadOutputCollectionParameter(args: string[]) {
+  let outputCollection: string = args[3];
+  if (!outputCollection) {
+    console.error(`Mandatory parameter missing: outputCollection`);
+    process.exit(1);
+  }
+  outputCollection = utils.resolveHome(outputCollection);
+  return outputCollection;
+}
+
+function loadInputFolderParameter(args: string[]) {
 
   let inputFolder: string = args[2];
   if (!inputFolder) {
@@ -19,24 +46,12 @@ function main(args:string[]) {
   }
   inputFolder = utils.removeTrailingSlash(inputFolder);
   inputFolder = utils.resolveHome(inputFolder);
+  return inputFolder;
+}
 
-  let outputCollection: string = args[3];
-  if (!outputCollection) {
-    console.error(`Mandatory parameter missing: outputCollection`);
-    process.exit(1);
-  }
-  outputCollection = utils.resolveHome(outputCollection);
+function saveCollection(outputCollection: string, postmanCollection: PCollection) {
 
-  let scratchPadCollection  = loadScratchPadCollection(inputFolder);
-  let postmanCollection: PCollection = {};
-
-  populateInfo(postmanCollection, scratchPadCollection);
-  populateAuth(postmanCollection, scratchPadCollection);
-  populateEvents(postmanCollection, scratchPadCollection);
-  populateVariables(postmanCollection, scratchPadCollection);
-
-  fs.writeFileSync(outputCollection, JSON.stringify(postmanCollection, null,'\t'))
-  console.log("DONE")
+  fs.writeFileSync(outputCollection, JSON.stringify(postmanCollection, null, '\t'));
 }
 
 function populateInfo(postmanCollection: PCollection, scratchPadCollection: SCollection) {
@@ -53,7 +68,9 @@ function populateAuth(postmanCollection: PCollection, scratchPadCollection: SCol
   postmanCollection.auth = {
     type: scratchPadCollection.auth.type,
   };
+
   postmanCollection.auth.basic = [];
+
   scratchPadCollection.auth.basic.forEach(v => {
     postmanCollection.auth.basic.push({
       key: v.key,
@@ -66,6 +83,7 @@ function populateAuth(postmanCollection: PCollection, scratchPadCollection: SCol
 function populateVariables(postmanCollection: PCollection, scratchPadCollection: SCollection) {
 
   postmanCollection.variable = [];
+
   scratchPadCollection.variables.forEach(v => {
     postmanCollection.variable.push({
       key: v.key,
@@ -78,6 +96,7 @@ function populateVariables(postmanCollection: PCollection, scratchPadCollection:
 function populateEvents(postmanCollection: PCollection, scratchPadCollection: SCollection) {
 
   postmanCollection.event = [];
+
   postmanCollection.event.push({
     listen: 'prerequest',
     script: {
@@ -85,6 +104,7 @@ function populateEvents(postmanCollection: PCollection, scratchPadCollection: SC
       exec: populateEventExec(scratchPadCollection.prerequest)
     }
   });
+
   postmanCollection.event.push({
     listen: 'test',
     script: {
@@ -95,10 +115,13 @@ function populateEvents(postmanCollection: PCollection, scratchPadCollection: SC
 }
 
 function populateEventExec(content:string):string[] {
+
   let result = [];
+
   content.split('\n').forEach(line=>{
     result.push(line)
   })
+
   return result
 }
 
@@ -106,12 +129,13 @@ function loadScratchPadCollection(inputFolder: string): SCollection {
 
   let collectionFolder = inputFolder + '/' + utils.getCounterPrefix(0) + 'Collection';
   let scratchPadCollectionFile = collectionFolder + '/' + utils.getCounterPrefix(0) + 'Settings.yaml';
-
   let yaml = fs.readFileSync(scratchPadCollectionFile).toString();
+
   return YAML.parse(yaml);
 }
 
 function printUsage() {
+
   console.info('Usage: node export-to-collection.js [inputFolder] [outputCollection] ');
   console.info('Example: node export-to-collection.js ~/Postman/collections/ ~/Postman/collections/my.postman_collection.json');
 }

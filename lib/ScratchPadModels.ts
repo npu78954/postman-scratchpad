@@ -4,13 +4,15 @@ export interface SCollection {
   auth?: SAuth
   variables?: SProperties[]
   prerequest?: string
-  tests: string
+  tests?: string
 }
+
 export interface SProperties {
   key?: string
   value?: string
   type?: string
 }
+
 export interface SAuth {
   type?: string
   basic?: SProperties[]

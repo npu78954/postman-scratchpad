@@ -5,6 +5,7 @@ export type PCollection = {
   event?: PEvent[]
   variable?: PProperties[]
 }
+
 export interface PAuth {
   type?: string
   basic?: PProperties[]
@@ -15,11 +16,13 @@ export interface PUrl {
   host?: string[]
   path?: string[]
 }
+
 export interface PProperties {
   key?: string
   value?: string
   type?: string
 }
+
 export interface PItem {
   name?: string
   item?: PItem[]
@@ -29,6 +32,7 @@ export interface PItem {
   }
   request?: PRequest
 }
+
 export interface PRequest {
   method?: string
   header?: PProperties[]
@@ -36,6 +40,7 @@ export interface PRequest {
   url?: PUrl
   description?: string
 }
+
 export interface PBody {
   mode?: string
   raw?: string
@@ -45,11 +50,13 @@ export interface PBody {
     }
   }
 }
+
 export interface PInfo {
   _postman_id?: string
   name?: string
   schema?: string
 }
+
 export interface PEvent {
 
     listen?: string

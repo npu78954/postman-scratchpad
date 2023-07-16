@@ -6,6 +6,27 @@ var Utilities_1 = require("./lib/Utilities");
 var utils = new Utilities_1.Utilities();
 main(process.argv);
 function main(args) {
+    var inputFolder = loadInputFolderParameter(args);
+    var outputCollection = loadOutputCollectionParameter(args);
+    var scratchPadCollection = loadScratchPadCollection(inputFolder);
+    var postmanCollection = {};
+    populateInfo(postmanCollection, scratchPadCollection);
+    populateAuth(postmanCollection, scratchPadCollection);
+    populateEvents(postmanCollection, scratchPadCollection);
+    populateVariables(postmanCollection, scratchPadCollection);
+    saveCollection(outputCollection, postmanCollection);
+    console.log("DONE");
+}
+function loadOutputCollectionParameter(args) {
+    var outputCollection = args[3];
+    if (!outputCollection) {
+        console.error("Mandatory parameter missing: outputCollection");
+        process.exit(1);
+    }
+    outputCollection = utils.resolveHome(outputCollection);
+    return outputCollection;
+}
+function loadInputFolderParameter(args) {
     var inputFolder = args[2];
     if (!inputFolder) {
         console.error("Mandatory parameter missing: inputFolder");
@@ -14,65 +35,55 @@ function main(args) {
     }
     inputFolder = utils.removeTrailingSlash(inputFolder);
     inputFolder = utils.resolveHome(inputFolder);
-    var outputCollection = args[3];
-    if (!outputCollection) {
-        console.error("Mandatory parameter missing: outputCollection");
-        process.exit(1);
-    }
-    outputCollection = utils.resolveHome(outputCollection);
-    var collectionSettings = loadCollectionSettings(inputFolder);
-    var c = {};
-    populateInfo(c, collectionSettings);
-    populateAuth(c, collectionSettings);
-    populateEvents(c, collectionSettings);
-    populateVariables(c, collectionSettings);
-    fs.writeFileSync(outputCollection, JSON.stringify(c, null, '\t'));
-    console.log("DONE");
+    return inputFolder;
 }
-function populateInfo(c, collectionSettings) {
-    c.info = {
-        _postman_id: collectionSettings.id,
-        name: collectionSettings.name,
+function saveCollection(outputCollection, postmanCollection) {
+    fs.writeFileSync(outputCollection, JSON.stringify(postmanCollection, null, '\t'));
+}
+function populateInfo(postmanCollection, scratchPadCollection) {
+    postmanCollection.info = {
+        _postman_id: scratchPadCollection.id,
+        name: scratchPadCollection.name,
         schema: 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json'
     };
 }
-function populateAuth(c, collectionSettings) {
-    c.auth = {
-        type: collectionSettings.auth.type,
+function populateAuth(postmanCollection, scratchPadCollection) {
+    postmanCollection.auth = {
+        type: scratchPadCollection.auth.type,
     };
-    c.auth.basic = [];
-    collectionSettings.auth.basic.forEach(function (v) {
-        c.auth.basic.push({
+    postmanCollection.auth.basic = [];
+    scratchPadCollection.auth.basic.forEach(function (v) {
+        postmanCollection.auth.basic.push({
             key: v.key,
             value: v.value,
             type: v.type
         });
     });
 }
-function populateVariables(c, collectionSettings) {
-    c.variable = [];
-    collectionSettings.variables.forEach(function (v) {
-        c.variable.push({
+function populateVariables(postmanCollection, scratchPadCollection) {
+    postmanCollection.variable = [];
+    scratchPadCollection.variables.forEach(function (v) {
+        postmanCollection.variable.push({
             key: v.key,
             value: v.value,
             type: 'default'
         });
     });
 }
-function populateEvents(c, collectionSettings) {
-    c.event = [];
-    c.event.push({
+function populateEvents(postmanCollection, scratchPadCollection) {
+    postmanCollection.event = [];
+    postmanCollection.event.push({
         listen: 'prerequest',
         script: {
             type: 'text/javascript',
-            exec: populateEventExec(collectionSettings.prerequest)
+            exec: populateEventExec(scratchPadCollection.prerequest)
         }
     });
-    c.event.push({
+    postmanCollection.event.push({
         listen: 'test',
         script: {
             type: 'text/javascript',
-            exec: populateEventExec(collectionSettings.tests)
+            exec: populateEventExec(scratchPadCollection.tests)
         }
     });
 }
@@ -83,10 +94,10 @@ function populateEventExec(content) {
     });
     return result;
 }
-function loadCollectionSettings(inputFolder) {
+function loadScratchPadCollection(inputFolder) {
     var collectionFolder = inputFolder + '/' + utils.getCounterPrefix(0) + 'Collection';
-    var collectionSettingsFile = collectionFolder + '/' + utils.getCounterPrefix(0) + 'Settings.yaml';
-    var yaml = fs.readFileSync(collectionSettingsFile).toString();
+    var scratchPadCollectionFile = collectionFolder + '/' + utils.getCounterPrefix(0) + 'Settings.yaml';
+    var yaml = fs.readFileSync(scratchPadCollectionFile).toString();
     return YAML.parse(yaml);
 }
 function printUsage() {
