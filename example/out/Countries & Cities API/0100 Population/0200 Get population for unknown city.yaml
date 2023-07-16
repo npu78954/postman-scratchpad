@@ -1,0 +1,16 @@
+method: POST
+url: "{{devURL}}{{baseEndpoint}}/population/cities"
+description: Get a single city and its population data
+headers:
+  - key: Content-Type
+    value: application/json; charset=utf-8
+body: |-
+  {
+      "city": "unknown"
+  }
+tests: |-
+  pm.test("Status code is 404", function () {
+      let json = pm.response.json();
+      pm.expect(json.error).to.be.true;
+      pm.expect(pm.response.code).to.equals(404);
+  });

@@ -1,0 +1,29 @@
+id: 241b15e0-5a34-4f13-b87e-38b827bbe2f3
+auth:
+  type: basic
+  basic:
+    - type: string
+      value: "{{password}}"
+      key: password
+    - type: string
+      value: "{{username}}"
+      key: username
+variables:
+  - type: any
+    value: lagos
+    key: city
+  - type: any
+    value: nigeria
+    key: country
+  - type: any
+    value: empty
+    key: username
+  - type: any
+    value: empty
+    key: password
+prerequest: |
+  // Just for testing
+  console.log('Collection: Before the request is executed');
+tests: |-
+  // Just for testing
+  console.log('Collection: After the request was executed');

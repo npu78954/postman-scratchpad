@@ -1,0 +1,20 @@
+method: POST
+url: "{{devURL}}{{baseEndpoint}}/population/cities"
+description: Get a single city and its population data
+headers:
+  - key: Content-Type
+    value: application/json; charset=utf-8
+body: |-
+  {
+      "city": "{{city}}"
+  }
+prerequest: |
+  // Just for testing
+  console.log('Before the request is executed');
+tests: >-
+  pm.test("Status code is 200", function () {
+      let json = pm.response.json();
+      pm.expect(json.error).to.be.false;
+      pm.expect(json.data.city.toLowerCase()).to.equals(pm.collectionVariables.get('city'));
+      pm.expect(pm.response.code).to.equals(200);
+  });

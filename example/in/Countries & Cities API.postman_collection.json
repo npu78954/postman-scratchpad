@@ -1,0 +1,585 @@
+{
+	"info": {
+		"_postman_id": "241b15e0-5a34-4f13-b87e-38b827bbe2f3",
+		"name": "Countries & Cities API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Population",
+			"item": [
+				{
+					"name": "Get single city and its population data",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Just for testing\r",
+									"console.log('Before the request is executed');\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    let json = pm.response.json();\r",
+									"    pm.expect(json.error).to.be.false;\r",
+									"    pm.expect(json.data.city.toLowerCase()).to.equals(pm.collectionVariables.get('city'));\r",
+									"    pm.expect(pm.response.code).to.equals(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableUrlEncoding": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json; charset=utf-8",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"city\": \"{{city}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{devURL}}{{baseEndpoint}}/population/cities",
+							"host": [
+								"{{devURL}}{{baseEndpoint}}"
+							],
+							"path": [
+								"population",
+								"cities"
+							]
+						},
+						"description": "Get a single city and its population data"
+					},
+					"response": [
+						{
+							"name": "Get single city and its population data",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"city\": \"lagos\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{devURL}}{{baseEndpoint}}/population/cities",
+									"host": [
+										"{{devURL}}{{baseEndpoint}}"
+									],
+									"path": [
+										"population",
+										"cities"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Access-Control-Allow-Headers",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "201"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"c9-8uwgtKLRJuVbAs2SMlqi2SSXfXQ\""
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 08 Aug 2020 06:20:20 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"error\": false,\n    \"msg\": \"lagos with population\",\n    \"data\": {\n        \"city\": \"Lagos\",\n        \"country\": \"Nigeria\",\n        \"populationCounts\": [\n            {\n                \"year\": \"1991\",\n                \"value\": \"5195247\",\n                \"sex\": \"Both Sexes\",\n                \"reliabilty\": \"Final figure, complete\"\n            }\n        ]\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Get population for unknown city",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {\r",
+									"    let json = pm.response.json();\r",
+									"    pm.expect(json.error).to.be.true;\r",
+									"    pm.expect(pm.response.code).to.equals(404);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableUrlEncoding": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json; charset=utf-8",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"city\": \"unknown\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{devURL}}{{baseEndpoint}}/population/cities",
+							"host": [
+								"{{devURL}}{{baseEndpoint}}"
+							],
+							"path": [
+								"population",
+								"cities"
+							]
+						},
+						"description": "Get a single city and its population data"
+					},
+					"response": [
+						{
+							"name": "Get single city and its population data",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"city\": \"lagos\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{devURL}}{{baseEndpoint}}/population/cities",
+									"host": [
+										"{{devURL}}{{baseEndpoint}}"
+									],
+									"path": [
+										"population",
+										"cities"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Access-Control-Allow-Headers",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "201"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"c9-8uwgtKLRJuVbAs2SMlqi2SSXfXQ\""
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 08 Aug 2020 06:20:20 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"error\": false,\n    \"msg\": \"lagos with population\",\n    \"data\": {\n        \"city\": \"Lagos\",\n        \"country\": \"Nigeria\",\n        \"populationCounts\": [\n            {\n                \"year\": \"1991\",\n                \"value\": \"5195247\",\n                \"sex\": \"Both Sexes\",\n                \"reliabilty\": \"Final figure, complete\"\n            }\n        ]\n    }\n}"
+						}
+					]
+				}
+			],
+			"description": "Countries and cities population related endpoints",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Cities",
+			"item": [
+				{
+					"name": "Get cities of a specified country",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    let json = pm.response.json();\r",
+									"    pm.expect(json.error).to.be.false;\r",
+									"    pm.expect(json.data).to.contain('Abuja')\r",
+									"    pm.expect(pm.response.code).to.equals(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json; charset=utf-8",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"country\": \"{{country}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{devURL}}{{baseEndpoint}}/cities",
+							"host": [
+								"{{devURL}}{{baseEndpoint}}"
+							],
+							"path": [
+								"cities"
+							]
+						},
+						"description": "Get all cities in a specified country"
+					},
+					"response": [
+						{
+							"name": "Get cities of a specified country",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"country\": \"nigeria\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{devURL}}{{baseEndpoint}}/cities",
+									"host": [
+										"{{devURL}}{{baseEndpoint}}"
+									],
+									"path": [
+										"cities"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Access-Control-Allow-Headers",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "858"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"35a-V15oVpwHN0jBGP5cr5uJtRIWeW4\""
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 02 Aug 2020 10:40:49 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"error\": false,\n    \"msg\": \"cities in nigeria retrieved\",\n    \"data\": [\n        \"Aba\",\n        \"Abakaliki\",\n        \"Abeokuta\",\n        \"Abraka\",\n        \"Abraka\",\n        \"Abuja\",\n        \"Ado-Ekiti\",\n        \"Adodo\",\n        \"Aganga\",\n        \"Agege\",\n        \"Agidingbi\",\n        \"Ajegunle\",\n        \"Ajuwon\",\n        \"Akure\",\n        \"Alimosho\",\n        \"Anambra\",\n        \"Apapa\",\n        \"Ayobo\",\n        \"Benin City\",\n        \"Birnin Kebbi\",\n        \"Bonny\",\n        \"Burutu\",\n        \"Bwari\",\n        \"Calabar\",\n        \"Chafe\",\n        \"Damaturu\",\n        \"Egbeda\",\n        \"Ekpoma\",\n        \"Enugu\",\n        \"Forum\",\n        \"Funtua\",\n        \"Ibadan\",\n        \"Ido\",\n        \"Ifako\",\n        \"Igando\",\n        \"Igueben\",\n        \"Ikeja\",\n        \"Ikorodu\",\n        \"Ikotun\",\n        \"Ile-Ife\",\n        \"Ilesa\",\n        \"Ilorin\",\n        \"Ipaja\",\n        \"Iseri-Oke\",\n        \"Isolo\",\n        \"Jalingo\",\n        \"Jos\",\n        \"Kaduna\",\n        \"Kano\",\n        \"Kebbi\",\n        \"Lagos\",\n        \"Lekki\",\n        \"Lokoja\",\n        \"Magodo\",\n        \"Makurdi\",\n        \"Maryland\",\n        \"Minna\",\n        \"Mogho\",\n        \"Mowe\",\n        \"Mushin\",\n        \"Nsukka\",\n        \"Obafemi\",\n        \"Obudu\",\n        \"Odau\",\n        \"Ojo\",\n        \"Ojota\",\n        \"Ondo\",\n        \"Onigbongbo\",\n        \"Orile Oshodi\",\n        \"Oshodi\",\n        \"Osogbo\",\n        \"Ota\",\n        \"Owerri\",\n        \"Oworonsoki\",\n        \"Port Harcourt\",\n        \"Shomolu\",\n        \"Suleja\",\n        \"Suru-Lere\",\n        \"Tara\",\n        \"Ughelli\",\n        \"Ungwan Madaki\",\n        \"Uyo\",\n        \"Warri\",\n        \"Warri\",\n        \"Yaba\",\n        \"Yola\",\n        \"Zaria\"\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Get cities of unknow country",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {\r",
+									"    let json = pm.response.json();\r",
+									"    pm.expect(json.error).to.be.true;\r",
+									"    pm.expect(pm.response.code).to.equals(404);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json; charset=utf-8",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"country\": \"unknown\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{devURL}}{{baseEndpoint}}/cities",
+							"host": [
+								"{{devURL}}{{baseEndpoint}}"
+							],
+							"path": [
+								"cities"
+							]
+						},
+						"description": "Get all cities in a specified country"
+					},
+					"response": [
+						{
+							"name": "Get cities of a specified country",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"country\": \"nigeria\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{devURL}}{{baseEndpoint}}/cities",
+									"host": [
+										"{{devURL}}{{baseEndpoint}}"
+									],
+									"path": [
+										"cities"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Access-Control-Allow-Headers",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "858"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"35a-V15oVpwHN0jBGP5cr5uJtRIWeW4\""
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 02 Aug 2020 10:40:49 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"error\": false,\n    \"msg\": \"cities in nigeria retrieved\",\n    \"data\": [\n        \"Aba\",\n        \"Abakaliki\",\n        \"Abeokuta\",\n        \"Abraka\",\n        \"Abraka\",\n        \"Abuja\",\n        \"Ado-Ekiti\",\n        \"Adodo\",\n        \"Aganga\",\n        \"Agege\",\n        \"Agidingbi\",\n        \"Ajegunle\",\n        \"Ajuwon\",\n        \"Akure\",\n        \"Alimosho\",\n        \"Anambra\",\n        \"Apapa\",\n        \"Ayobo\",\n        \"Benin City\",\n        \"Birnin Kebbi\",\n        \"Bonny\",\n        \"Burutu\",\n        \"Bwari\",\n        \"Calabar\",\n        \"Chafe\",\n        \"Damaturu\",\n        \"Egbeda\",\n        \"Ekpoma\",\n        \"Enugu\",\n        \"Forum\",\n        \"Funtua\",\n        \"Ibadan\",\n        \"Ido\",\n        \"Ifako\",\n        \"Igando\",\n        \"Igueben\",\n        \"Ikeja\",\n        \"Ikorodu\",\n        \"Ikotun\",\n        \"Ile-Ife\",\n        \"Ilesa\",\n        \"Ilorin\",\n        \"Ipaja\",\n        \"Iseri-Oke\",\n        \"Isolo\",\n        \"Jalingo\",\n        \"Jos\",\n        \"Kaduna\",\n        \"Kano\",\n        \"Kebbi\",\n        \"Lagos\",\n        \"Lekki\",\n        \"Lokoja\",\n        \"Magodo\",\n        \"Makurdi\",\n        \"Maryland\",\n        \"Minna\",\n        \"Mogho\",\n        \"Mowe\",\n        \"Mushin\",\n        \"Nsukka\",\n        \"Obafemi\",\n        \"Obudu\",\n        \"Odau\",\n        \"Ojo\",\n        \"Ojota\",\n        \"Ondo\",\n        \"Onigbongbo\",\n        \"Orile Oshodi\",\n        \"Oshodi\",\n        \"Osogbo\",\n        \"Ota\",\n        \"Owerri\",\n        \"Oworonsoki\",\n        \"Port Harcourt\",\n        \"Shomolu\",\n        \"Suleja\",\n        \"Suru-Lere\",\n        \"Tara\",\n        \"Ughelli\",\n        \"Ungwan Madaki\",\n        \"Uyo\",\n        \"Warri\",\n        \"Warri\",\n        \"Yaba\",\n        \"Yola\",\n        \"Zaria\"\n    ]\n}"
+						}
+					]
+				}
+			],
+			"description": "cities related endpoints"
+		}
+	],
+	"auth": {
+		"type": "basic",
+		"basic": [
+			{
+				"key": "password",
+				"value": "{{password}}",
+				"type": "string"
+			},
+			{
+				"key": "username",
+				"value": "{{username}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Just for testing",
+					"console.log('Collection: Before the request is executed');",
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Just for testing",
+					"console.log('Collection: After the request was executed');"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "city",
+			"value": "lagos",
+			"type": "default"
+		},
+		{
+			"key": "country",
+			"value": "nigeria",
+			"type": "default"
+		},
+		{
+			"key": "username",
+			"value": "empty",
+			"type": "default"
+		},
+		{
+			"key": "password",
+			"value": "empty",
+			"type": "default"
+		}
+	]
+}

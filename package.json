@@ -1,0 +1,20 @@
+{
+  "name": "postman-scratchpad",
+  "version": "1.0.0",
+  "description": "Extract all requests from a postman collection so that they can be edited outside the Postman UI with any IDE",
+  "scripts": {
+    "build": "tsc --build",
+    "clean": "tsc --build --clean",
+	  "start": "node ./generated/extract-scratchpad.js"
+  },
+  "author": "npu78954",
+  "license": "ISC",
+  "dependencies": {
+    "@types/postman-collection": "^3.5.7",
+    "postman-collection": "^4.1.7",
+    "yaml": "^2.3.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.1.6"
+  }
+}

@@ -1,0 +1,17 @@
+method: POST
+url: "{{devURL}}{{baseEndpoint}}/cities"
+description: Get all cities in a specified country
+headers:
+  - key: Content-Type
+    value: application/json; charset=utf-8
+body: |-
+  {
+      "country": "{{country}}"
+  }
+tests: |-
+  pm.test("Status code is 200", function () {
+      let json = pm.response.json();
+      pm.expect(json.error).to.be.false;
+      pm.expect(json.data).to.contain('Abuja')
+      pm.expect(pm.response.code).to.equals(200);
+  });
