@@ -1,7 +1,5 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+
     "version": "0.2.0",
     "configurations": [
       {
@@ -18,7 +16,7 @@
         "request": "launch",
         "name": "extract-scratchpad",
         "program": "${workspaceFolder}/extract-scratchpad.ts",
-        "args": [ "./example/in/Countries & Cities API.postman_collection.json", "./example/out/",  ],
+        "args": [ "./example/in/Countries & Cities API.postman_collection.json", "./example/out/"  ],
         "preLaunchTask": "tsc: build - tsconfig.json",
         "internalConsoleOptions": "openOnSessionStart",
         "outFiles": ["${workspaceFolder}/generated/**/*.js"]

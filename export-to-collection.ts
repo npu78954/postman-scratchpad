@@ -23,7 +23,7 @@ function main(args:string[]) {
   populateVariables(postmanCollection, scratchPadCollection);
   saveCollection(outputCollection, postmanCollection);
 
-  console.log("DONE")
+  console.log("DONE");
 }
 
 function loadOutputCollectionParameter(args: string[]) {

@@ -130,8 +130,7 @@ function saveFolderRecursive(folderPath: string, postmanCollection : Collection,
       saveRequest(item, folderPath, itemCounter);
     }
     itemCounter++;
-  })
-
+  });
 }
 
 function saveRequest(postmanItem: Item, folderPath: string, itemCounter: number): void {
