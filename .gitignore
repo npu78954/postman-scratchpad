@@ -1,3 +1,5 @@
 /.vscode
 /node_modules
 /generated
+/example/out/Dee*
+/run-example2.sh
