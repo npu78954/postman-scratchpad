@@ -1,6 +1,8 @@
 import { Item, Collection, DescriptionDefinition, Event } from "postman-collection";
 import * as fs from 'fs';
 import * as YAML from 'yaml';
+import * as path from 'path';
+import * as os from 'os';
 
 main(process.argv);
 
@@ -9,15 +11,18 @@ function main(args:string[]) {
   let inputCollection: string = args[2];
   if (!inputCollection) {
     console.error(`Mandatory parameter missing: inputCollection`);
+    printUsage();
     process.exit(1);
   }
+  inputCollection = resolveHome(inputCollection);
 
   let outputFolder: string = args[3];
   if (!outputFolder) {
-    console.error(`Mandatory parameter missing: output folder`);
+    console.error(`Mandatory parameter missing: outputFolder`);
     process.exit(1);
   }
   outputFolder = removeTrailingSlash(outputFolder);
+  outputFolder = resolveHome(outputFolder);
   let collection: Collection = new Collection(JSON.parse(fs.readFileSync(inputCollection).toString()));
   let collectionFolder: string = outputFolder + '/' + collection.name;
 
@@ -31,12 +36,18 @@ function main(args:string[]) {
   process.exit(0);
 }
 
+function printUsage() {
+  console.info('Usage: node extract-scratchpad.js [inputCollection] [outputFolder] ');
+  console.info('Example: node extract-scratchpad.js ~/Postman/collections/my.postman_collection.json ~/Postman/collections/ ');
+}
+
 function saveCollectionSettings(collectionFolder: string, collection: Collection) {
 
   let counter: string = getCounter(0);
   let folder: string = collectionFolder + '/' + counter + 'Collection';
   fs.mkdirSync(folder);
   let result: any = {};
+  result.name = collection.name;
   result.id = collection.id;
   result.auth = collection.auth;
   if (collection.variables.count() > 0)
@@ -101,6 +112,7 @@ function saveRequest(item: Item, folderPath: string, itemCounter: number): void 
   let counter: string = getCounter(itemCounter);
   let result: any = {};
 
+  result.name = item.name;
   result.method = item.request.method;
   result.url = item.request.url.toString();
 
@@ -158,4 +170,9 @@ function sanitizeMultiline(text: string): string {
 
 function getCounter(itemCounter: number): string {
   return itemCounter.toString().padStart(2, '0') + '00 ';
+}
+
+function resolveHome(filepath: string) {
+
+  return filepath.replace("~", os.homedir);
 }

@@ -1,3 +1,4 @@
+name: Get single city and its population data
 method: POST
 url: "{{devURL}}{{baseEndpoint}}/population/cities"
 description: Get a single city and its population data

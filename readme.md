@@ -28,10 +28,17 @@ npm install
 And then you can run the example with:
 
 ```bash
-npm run clean && npm run build && npm start "./example/in/Countries & Cities API.postman_collection.json" "./example/out/"
+./run-example.sh
 ```
 
-or even simpler
+Or the following command to also rebuild the .js file
+
 ```bash
-./run-example.sh
+./build-and-run-example.sh
+```
+
+Finally to extract your own postman collection, you can use the following command:
+
+```bash
+ node ./generated/extract-scratchpad.js ~/Postman/collections/my.postman_collection.json ~/Postman/collections/
 ```
