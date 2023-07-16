@@ -27,33 +27,35 @@ function main(args:string[]) {
   }
   outputCollection = utils.resolveHome(outputCollection);
 
-  let collectionSettings  = loadCollectionSettings(inputFolder);
+  let scratchPadCollection  = loadScratchPadCollection(inputFolder);
+  let postmanCollection: PCollection = {};
 
-  let c: PCollection = {};
-  populateInfo(c, collectionSettings);
-  populateAuth(c, collectionSettings);
-  populateEvents(c, collectionSettings);
-  populateVariables(c, collectionSettings);
+  populateInfo(postmanCollection, scratchPadCollection);
+  populateAuth(postmanCollection, scratchPadCollection);
+  populateEvents(postmanCollection, scratchPadCollection);
+  populateVariables(postmanCollection, scratchPadCollection);
 
-  fs.writeFileSync(outputCollection, JSON.stringify(c, null,'\t'))
+  fs.writeFileSync(outputCollection, JSON.stringify(postmanCollection, null,'\t'))
   console.log("DONE")
 }
 
-function populateInfo(c: PCollection, collectionSettings: SCollection) {
-  c.info = {
-    _postman_id: collectionSettings.id,
-    name: collectionSettings.name,
+function populateInfo(postmanCollection: PCollection, scratchPadCollection: SCollection) {
+
+  postmanCollection.info = {
+    _postman_id: scratchPadCollection.id,
+    name: scratchPadCollection.name,
     schema: 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json'
   };
 }
 
-function populateAuth(c: PCollection, collectionSettings: SCollection) {
-  c.auth = {
-    type: collectionSettings.auth.type,
+function populateAuth(postmanCollection: PCollection, scratchPadCollection: SCollection) {
+
+  postmanCollection.auth = {
+    type: scratchPadCollection.auth.type,
   };
-  c.auth.basic = [];
-  collectionSettings.auth.basic.forEach(v => {
-    c.auth.basic.push({
+  postmanCollection.auth.basic = [];
+  scratchPadCollection.auth.basic.forEach(v => {
+    postmanCollection.auth.basic.push({
       key: v.key,
       value: v.value,
       type: v.type
@@ -61,10 +63,11 @@ function populateAuth(c: PCollection, collectionSettings: SCollection) {
   });
 }
 
-function populateVariables(c: PCollection, collectionSettings: SCollection) {
-  c.variable = [];
-  collectionSettings.variables.forEach(v => {
-    c.variable.push({
+function populateVariables(postmanCollection: PCollection, scratchPadCollection: SCollection) {
+
+  postmanCollection.variable = [];
+  scratchPadCollection.variables.forEach(v => {
+    postmanCollection.variable.push({
       key: v.key,
       value: v.value,
       type: 'default'
@@ -72,20 +75,21 @@ function populateVariables(c: PCollection, collectionSettings: SCollection) {
   });
 }
 
-function populateEvents(c: PCollection, collectionSettings: SCollection) {
-  c.event = [];
-  c.event.push({
+function populateEvents(postmanCollection: PCollection, scratchPadCollection: SCollection) {
+
+  postmanCollection.event = [];
+  postmanCollection.event.push({
     listen: 'prerequest',
     script: {
       type: 'text/javascript',
-      exec: populateEventExec(collectionSettings.prerequest)
+      exec: populateEventExec(scratchPadCollection.prerequest)
     }
   });
-  c.event.push({
+  postmanCollection.event.push({
     listen: 'test',
     script: {
       type: 'text/javascript',
-      exec: populateEventExec(collectionSettings.tests)
+      exec: populateEventExec(scratchPadCollection.tests)
     }
   });
 }
@@ -98,11 +102,12 @@ function populateEventExec(content:string):string[] {
   return result
 }
 
-function loadCollectionSettings(inputFolder: string): SCollection {
-  let collectionFolder = inputFolder + '/' + utils.getCounterPrefix(0) + 'Collection';
-  let collectionSettingsFile = collectionFolder + '/' + utils.getCounterPrefix(0) + 'Settings.yaml';
+function loadScratchPadCollection(inputFolder: string): SCollection {
 
-  let yaml = fs.readFileSync(collectionSettingsFile).toString();
+  let collectionFolder = inputFolder + '/' + utils.getCounterPrefix(0) + 'Collection';
+  let scratchPadCollectionFile = collectionFolder + '/' + utils.getCounterPrefix(0) + 'Settings.yaml';
+
+  let yaml = fs.readFileSync(scratchPadCollectionFile).toString();
   return YAML.parse(yaml);
 }
 
