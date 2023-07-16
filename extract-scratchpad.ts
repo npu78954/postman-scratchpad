@@ -1,8 +1,9 @@
 import * as fs from 'fs';
 import * as YAML from 'yaml';
 
-import { Item, Collection, DescriptionDefinition, Event } from "postman-collection";
+import { Item, Collection, Event } from "postman-collection";
 import {Utilities} from './lib/Utilities';
+import { SCollection, SItem } from './lib/ScratchPadModels';
 
 const utils = new Utilities();
 
@@ -10,13 +11,23 @@ main(process.argv);
 
 function main(args:string[]) {
 
-  let inputCollection: string = args[2];
-  if (!inputCollection) {
-    console.error(`Mandatory parameter missing: inputCollection`);
-    printUsage();
-    process.exit(1);
-  }
-  inputCollection = utils.resolveHome(inputCollection);
+  let inputCollection: string = loadInputCollectionParameter(args);
+  let outputFolder: string = loadOutputFolderParameter(args);
+
+  let postmanCollection: Collection = new Collection(JSON.parse(fs.readFileSync(inputCollection).toString()));
+  let collectionFolder: string = outputFolder + '/' + postmanCollection.name;
+
+  console.info(`Starting to extract the postman collection "${inputCollection}"`);
+
+  recreateCollectionFolder(collectionFolder);
+  saveCollectionSettings(collectionFolder, postmanCollection);
+  saveFolderRecursive(collectionFolder, postmanCollection, true);
+
+  console.info(`The collection was successfully extracted to "${collectionFolder}"`);
+  process.exit(0);
+}
+
+function loadOutputFolderParameter(args: string[]) {
 
   let outputFolder: string = args[3];
   if (!outputFolder) {
@@ -25,18 +36,19 @@ function main(args:string[]) {
   }
   outputFolder = utils.removeTrailingSlash(outputFolder);
   outputFolder = utils.resolveHome(outputFolder);
+  return outputFolder;
+}
 
-  let collection: Collection = new Collection(JSON.parse(fs.readFileSync(inputCollection).toString()));
-  let collectionFolder: string = outputFolder + '/' + collection.name;
+function loadInputCollectionParameter(args: string[]) {
 
-  console.info(`Starting to extract the postman collection "${inputCollection}"`);
-
-  recreateCollectionFolder(collectionFolder);
-  saveCollectionSettings(collectionFolder, collection);
-  saveFolderRecursive(collectionFolder, collection, true);
-
-  console.info(`The collection was successfully extracted to "${collectionFolder}"`);
-  process.exit(0);
+  let inputCollection: string = args[2];
+  if (!inputCollection) {
+    console.error(`Mandatory parameter missing: inputCollection`);
+    printUsage();
+    process.exit(1);
+  }
+  inputCollection = utils.resolveHome(inputCollection);
+  return inputCollection;
 }
 
 function printUsage() {
@@ -44,35 +56,54 @@ function printUsage() {
   console.info('Example: node extract-scratchpad.js ~/Postman/collections/my.postman_collection.json ~/Postman/collections/ ');
 }
 
-function saveCollectionSettings(collectionFolder: string, collection: Collection) {
+function saveCollectionSettings(collectionFolder: string, postmanCollection: Collection) {
 
   let counter: string = utils.getCounterPrefix(0);
   let folder: string = collectionFolder + '/' + counter + 'Collection';
   fs.mkdirSync(folder);
-  let result: any = {};
-  result.name = collection.name;
-  result.id = collection.id;
-  result.auth = collection.auth;
-  if (collection.variables.count() > 0)
-    result.variables = collection.variables;
-  let prerequest: Event = collection.events.find(f => f.listen === 'prerequest', null);
+  let scratchPadCollection: SCollection = {};
+  scratchPadCollection.id = postmanCollection.id;
+  scratchPadCollection.name = postmanCollection.name;
+  scratchPadCollection.auth = postmanCollection.auth;
+
+  populateVariables(postmanCollection, scratchPadCollection);
+  populateEvents(postmanCollection , scratchPadCollection);
+
+  fs.writeFileSync(folder + '/' + counter + 'Settings.yaml', YAML.stringify(scratchPadCollection));
+  console.debug(`Generated file: "${folder}/${counter}Settings.yaml"`);
+}
+
+function populateVariables(postmanCollection: Collection, scratchPadCollection: SCollection) {
+
+  if (postmanCollection.variables.count() > 0) {
+    scratchPadCollection.variables = [];
+    postmanCollection.variables.each(v => {
+      scratchPadCollection.variables.push({
+        key: v.key,
+        value: v.value,
+        type: 'default'
+      });
+    });
+  }
+}
+
+function populateEvents(postmanItem: Item | Collection, scratchPadCollection: SCollection) {
+
+  let prerequest: Event = postmanItem.events.find(f => f.listen === 'prerequest', null);
   if (prerequest) {
     let prerequestScript: string = prerequest.script.exec.join('\n');
     if (prerequestScript !== '') {
-      result.prerequest = utils.sanitizeMultiline(prerequestScript);
+      scratchPadCollection.prerequest = utils.sanitizeMultiline(prerequestScript);
     }
   }
 
-  let tests: Event = collection.events.find(f => f.listen === 'test', null);
+  let tests: Event = postmanItem.events.find(f => f.listen === 'test', null);
   if (tests) {
     let testsScript: string = tests.script.exec.join('\n');
     if (testsScript !== '') {
-      result.tests = utils.sanitizeMultiline(testsScript);
+      scratchPadCollection.tests = utils.sanitizeMultiline(testsScript);
     }
   }
-
-  fs.writeFileSync(folder + '/' + counter + 'Settings.yaml', YAML.stringify(result));
-  console.debug(`Generated file: "${folder}/${counter}Settings.yaml"`);
 }
 
 function recreateCollectionFolder(collectionFolder: string) {
@@ -85,13 +116,13 @@ function recreateCollectionFolder(collectionFolder: string) {
   fs.mkdirSync(collectionFolder);
 }
 
-function saveFolderRecursive(folderPath: string, folder : any, isRoot: boolean = false): void {
+function saveFolderRecursive(folderPath: string, postmanCollection : Collection, isRoot: boolean = false): void {
 
   let itemCounter: number = 1;
   if (!isRoot)
     fs.mkdirSync(folderPath);
 
-  folder.items.each(item => {
+  postmanCollection.items.each((item: any) => {
     if (item.items) {
       let counter = utils.getCounterPrefix(itemCounter);
       saveFolderRecursive(folderPath + '/' + counter + utils.sanitizeFileName(item.name), item);
@@ -103,52 +134,58 @@ function saveFolderRecursive(folderPath: string, folder : any, isRoot: boolean =
 
 }
 
-function saveRequest(item: Item, folderPath: string, itemCounter: number): void {
+function saveRequest(postmanItem: Item, folderPath: string, itemCounter: number): void {
 
   let counter: string = utils.getCounterPrefix(itemCounter);
-  let result: any = {};
+  let scratchPadItem: SItem = {};
 
-  result.name = item.name;
-  result.method = item.request.method;
-  result.url = item.request.url.toString();
+  scratchPadItem.name = postmanItem.name;
+  populateDescription(postmanItem, scratchPadItem);
+  scratchPadItem.method = postmanItem.request.method;
+  scratchPadItem.url = postmanItem.request.url.toString();
+  populateHeaders(postmanItem, scratchPadItem);
+  scratchPadItem.auth = postmanItem.request.auth;
 
-  let descriptionDefinition: DescriptionDefinition = (item.request.description as DescriptionDefinition);
-  if (descriptionDefinition) {
-    if (descriptionDefinition.content)
-      result.description = descriptionDefinition.content;
-    else
-      result.description = (item.request.description as string);
-  }
+  populateBody(postmanItem, scratchPadItem);
 
-  result.auth = item.request.auth;
-  if (item.request.headers.contentSize() > 0)
-    result.headers = item.request.headers;
+  populateEvents(postmanItem, scratchPadItem);
 
-  if (item.request.body && item.request.body.raw) {
-    result.body = utils.sanitizeMultiline(item.request.body.raw);
-  }
+  let sanitizedFileName: string = counter + utils.sanitizeFileName(postmanItem.name) + '.yaml';
 
-  let prerequest: Event = item.events.find(f => f.listen === 'prerequest', null);
-  if (prerequest) {
-    let prerequestScript = prerequest.script.exec.join('\n');
-    if (prerequestScript !== '') {
-      result.prerequest = utils.sanitizeMultiline(prerequestScript);
-    }
-  }
-
-  let tests: Event = item.events.find(f => f.listen === 'test', null);
-  if (tests) {
-    let testsScript = tests.script.exec.join('\n');
-    if (testsScript !== '') {
-      result.tests = utils.sanitizeMultiline(testsScript);
-    }
-  }
-
-  let sanitizedFileName: string = counter + utils.sanitizeFileName(item.name) + '.yaml';
-
-  fs.writeFileSync(folderPath + '/' + sanitizedFileName, YAML.stringify(result));
+  fs.writeFileSync(folderPath + '/' + sanitizedFileName, YAML.stringify(scratchPadItem));
   console.debug(`Generated file: "${folderPath}/${sanitizedFileName}"`);
 }
 
 
+
+function populateBody(item: Item, scratchPadItem: SItem) {
+
+  if (item.request.body && item.request.body.raw) {
+    scratchPadItem.body = utils.sanitizeMultiline(item.request.body.raw);
+  }
+}
+
+function populateDescription(item: Item, scratchPadItem: SItem) {
+
+  let descriptionDefinition: any = item.request.description;
+  if (descriptionDefinition) {
+    if (descriptionDefinition.content)
+      scratchPadItem.description = descriptionDefinition.content;
+    else
+      scratchPadItem.description = descriptionDefinition;
+  }
+}
+
+function populateHeaders(item: Item, scratchPadItem: SItem) {
+
+  if (item.request.headers.contentSize() > 0) {
+    scratchPadItem.headers = [];
+    item.request.headers.each(h => {
+      scratchPadItem.headers.push({
+        key: h.key,
+        value: h.value
+      });
+    });
+  }
+}
 

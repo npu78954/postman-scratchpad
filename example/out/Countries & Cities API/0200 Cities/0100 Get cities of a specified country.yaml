@@ -1,7 +1,7 @@
 name: Get cities of a specified country
+description: Get all cities in a specified country
 method: POST
 url: "{{devURL}}{{baseEndpoint}}/cities"
-description: Get all cities in a specified country
 headers:
   - key: Content-Type
     value: application/json; charset=utf-8

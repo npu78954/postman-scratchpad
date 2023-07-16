@@ -1,5 +1,5 @@
-name: Countries & Cities API
 id: 241b15e0-5a34-4f13-b87e-38b827bbe2f3
+name: Countries & Cities API
 auth:
   type: basic
   basic:
@@ -10,18 +10,18 @@ auth:
       value: "{{username}}"
       key: username
 variables:
-  - type: any
+  - key: city
     value: lagos
-    key: city
-  - type: any
+    type: default
+  - key: country
     value: nigeria
-    key: country
-  - type: any
+    type: default
+  - key: username
     value: empty
-    key: username
-  - type: any
+    type: default
+  - key: password
     value: empty
-    key: password
+    type: default
 prerequest: |
   // Just for testing
   console.log('Collection: Before the request is executed');

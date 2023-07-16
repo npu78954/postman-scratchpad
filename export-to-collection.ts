@@ -88,7 +88,7 @@ function populateVariables(postmanCollection: PCollection, scratchPadCollection:
     postmanCollection.variable.push({
       key: v.key,
       value: v.value,
-      type: 'default'
+      type: v.type
     });
   });
 }
