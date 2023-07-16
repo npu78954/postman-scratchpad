@@ -52,7 +52,7 @@ function saveCollectionSettings(collectionFolder, postmanCollection) {
     scratchPadCollection.auth = postmanCollection.auth;
     populateVariables(postmanCollection, scratchPadCollection);
     populateEvents(postmanCollection, scratchPadCollection);
-    fs.writeFileSync(folder + '/' + counter + 'Settings.yaml', YAML.stringify(scratchPadCollection));
+    fs.writeFileSync("".concat(folder, "/").concat(counter, "Settings.yaml"), YAML.stringify(scratchPadCollection));
     console.debug("Generated file: \"".concat(folder, "/").concat(counter, "Settings.yaml\""));
 }
 function populateVariables(postmanCollection, scratchPadCollection) {
@@ -119,7 +119,7 @@ function saveRequest(postmanItem, folderPath, itemCounter) {
     populateBody(postmanItem, scratchPadItem);
     populateEvents(postmanItem, scratchPadItem);
     var sanitizedFileName = counter + utils.sanitizeFileName(postmanItem.name) + '.yaml';
-    fs.writeFileSync(folderPath + '/' + sanitizedFileName, YAML.stringify(scratchPadItem));
+    fs.writeFileSync("".concat(folderPath, "/").concat(sanitizedFileName), YAML.stringify(scratchPadItem));
     console.debug("Generated file: \"".concat(folderPath, "/").concat(sanitizedFileName, "\""));
 }
 function populateBody(item, scratchPadItem) {
