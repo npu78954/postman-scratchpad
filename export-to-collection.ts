@@ -6,6 +6,7 @@ import {PCollection, PEvent, PItem, PRequest, PUrl} from './lib/PostmanModels';
 import {SCollection, SItem} from './lib/ScratchPadModels';
 
 const utils = new Utilities();
+const SETTINGS_FILE = 'Settings.yaml';
 
 main(process.argv);
 
@@ -229,25 +230,23 @@ function populateEventExec(content:string):string[] {
 
 function loadScratchPadCollection(inputFolder: string): SCollection {
 
-  let collectionFolderName = utils.getCounterPrefix(0) + 'Collection';
-  let collectionFolder = inputFolder + '/' + collectionFolderName;
-  let scratchPadCollectionFile = collectionFolder + '/' + utils.getCounterPrefix(0) + 'Settings.yaml';
+  let scratchPadCollectionFile = inputFolder + '/' + SETTINGS_FILE;
   let yaml = fs.readFileSync(scratchPadCollectionFile).toString();
   let scratchPadCollection: SCollection =  YAML.parse(yaml);
   scratchPadCollection.items = [];
   scratchPadCollection.name = utils.getFolderName(inputFolder);
-  loadItemsRecursive(inputFolder, collectionFolderName, scratchPadCollection, scratchPadCollection);
+  loadItemsRecursive(inputFolder, scratchPadCollection, scratchPadCollection);
 
   return scratchPadCollection;
 }
 
-function loadItemsRecursive(inputFolder: string, collectionFolderName: string, scratchPadCollection: SCollection,
+function loadItemsRecursive(inputFolder: string, scratchPadCollection: SCollection,
   parentScratchPadItem: SItem) {
 
   let dirContent: string[] = fs.readdirSync(inputFolder);
   dirContent.forEach(name => {
 
-    if (name === collectionFolderName) {
+    if (name === SETTINGS_FILE) {
       return;
     }
 
@@ -261,7 +260,7 @@ function loadItemsRecursive(inputFolder: string, collectionFolderName: string, s
         items: []
       }
       parentScratchPadItem.items.push(scratchPadItem);
-      loadItemsRecursive(inputFolder + '/' + name, collectionFolderName, scratchPadCollection, scratchPadItem);
+      loadItemsRecursive(inputFolder + '/' + name, scratchPadCollection, scratchPadItem);
 
     } else {
 

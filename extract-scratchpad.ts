@@ -58,9 +58,6 @@ function printUsage() {
 
 function saveCollectionSettings(collectionFolder: string, postmanCollection: Collection) {
 
-  let counter: string = utils.getCounterPrefix(0);
-  let folder: string = collectionFolder + '/' + counter + 'Collection';
-  fs.mkdirSync(folder);
   let scratchPadCollection: SCollection = {};
   scratchPadCollection.id = postmanCollection.id;
   scratchPadCollection.auth = postmanCollection.auth;
@@ -68,8 +65,8 @@ function saveCollectionSettings(collectionFolder: string, postmanCollection: Col
   populateVariables(postmanCollection, scratchPadCollection);
   populateEvents(postmanCollection , scratchPadCollection);
 
-  fs.writeFileSync(`${folder}/${counter}Settings.yaml`, YAML.stringify(scratchPadCollection));
-  console.debug(`Generated file: "${folder}/${counter}Settings.yaml"`);
+  fs.writeFileSync(`${collectionFolder}/Settings.yaml`, YAML.stringify(scratchPadCollection));
+  console.debug(`Generated file: "${collectionFolder}/Settings.yaml"`);
 }
 
 function populateVariables(postmanCollection: Collection, scratchPadCollection: SCollection) {

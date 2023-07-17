@@ -43,16 +43,13 @@ function printUsage() {
     console.info('Example: node extract-scratchpad.js ~/Postman/collections/my.postman_collection.json ~/Postman/collections/ ');
 }
 function saveCollectionSettings(collectionFolder, postmanCollection) {
-    var counter = utils.getCounterPrefix(0);
-    var folder = collectionFolder + '/' + counter + 'Collection';
-    fs.mkdirSync(folder);
     var scratchPadCollection = {};
     scratchPadCollection.id = postmanCollection.id;
     scratchPadCollection.auth = postmanCollection.auth;
     populateVariables(postmanCollection, scratchPadCollection);
     populateEvents(postmanCollection, scratchPadCollection);
-    fs.writeFileSync("".concat(folder, "/").concat(counter, "Settings.yaml"), YAML.stringify(scratchPadCollection));
-    console.debug("Generated file: \"".concat(folder, "/").concat(counter, "Settings.yaml\""));
+    fs.writeFileSync("".concat(collectionFolder, "/Settings.yaml"), YAML.stringify(scratchPadCollection));
+    console.debug("Generated file: \"".concat(collectionFolder, "/Settings.yaml\""));
 }
 function populateVariables(postmanCollection, scratchPadCollection) {
     if (postmanCollection.variables.count() > 0) {

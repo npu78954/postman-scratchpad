@@ -4,6 +4,7 @@ var fs = require("fs");
 var YAML = require("yaml");
 var Utilities_1 = require("./lib/Utilities");
 var utils = new Utilities_1.Utilities();
+var SETTINGS_FILE = 'Settings.yaml';
 main(process.argv);
 function main(args) {
     var inputFolder = loadInputFolderParameter(args);
@@ -183,20 +184,18 @@ function populateEventExec(content) {
     return result;
 }
 function loadScratchPadCollection(inputFolder) {
-    var collectionFolderName = utils.getCounterPrefix(0) + 'Collection';
-    var collectionFolder = inputFolder + '/' + collectionFolderName;
-    var scratchPadCollectionFile = collectionFolder + '/' + utils.getCounterPrefix(0) + 'Settings.yaml';
+    var scratchPadCollectionFile = inputFolder + '/' + SETTINGS_FILE;
     var yaml = fs.readFileSync(scratchPadCollectionFile).toString();
     var scratchPadCollection = YAML.parse(yaml);
     scratchPadCollection.items = [];
     scratchPadCollection.name = utils.getFolderName(inputFolder);
-    loadItemsRecursive(inputFolder, collectionFolderName, scratchPadCollection, scratchPadCollection);
+    loadItemsRecursive(inputFolder, scratchPadCollection, scratchPadCollection);
     return scratchPadCollection;
 }
-function loadItemsRecursive(inputFolder, collectionFolderName, scratchPadCollection, parentScratchPadItem) {
+function loadItemsRecursive(inputFolder, scratchPadCollection, parentScratchPadItem) {
     var dirContent = fs.readdirSync(inputFolder);
     dirContent.forEach(function (name) {
-        if (name === collectionFolderName) {
+        if (name === SETTINGS_FILE) {
             return;
         }
         var isDir = fs.statSync(inputFolder + '/' + name).isDirectory();
@@ -208,7 +207,7 @@ function loadItemsRecursive(inputFolder, collectionFolderName, scratchPadCollect
                 items: []
             };
             parentScratchPadItem.items.push(scratchPadItem);
-            loadItemsRecursive(inputFolder + '/' + name, collectionFolderName, scratchPadCollection, scratchPadItem);
+            loadItemsRecursive(inputFolder + '/' + name, scratchPadCollection, scratchPadItem);
         }
         else {
             console.log("Loading file: ".concat(current));
