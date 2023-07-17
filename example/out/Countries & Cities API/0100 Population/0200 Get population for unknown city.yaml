@@ -1,4 +1,3 @@
-name: Get population for unknown city
 description: Get a single city and its population data
 method: POST
 url: "{{devURL}}{{baseEndpoint}}/population/cities"

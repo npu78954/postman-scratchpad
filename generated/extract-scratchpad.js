@@ -48,7 +48,6 @@ function saveCollectionSettings(collectionFolder, postmanCollection) {
     fs.mkdirSync(folder);
     var scratchPadCollection = {};
     scratchPadCollection.id = postmanCollection.id;
-    scratchPadCollection.name = postmanCollection.name;
     scratchPadCollection.auth = postmanCollection.auth;
     populateVariables(postmanCollection, scratchPadCollection);
     populateEvents(postmanCollection, scratchPadCollection);
@@ -110,7 +109,6 @@ function saveFolderRecursive(folderPath, postmanCollection, isRoot) {
 function saveRequest(postmanItem, folderPath, itemCounter) {
     var counter = utils.getCounterPrefix(itemCounter);
     var scratchPadItem = {};
-    scratchPadItem.name = postmanItem.name;
     populateDescription(postmanItem, scratchPadItem);
     scratchPadItem.method = postmanItem.request.method;
     scratchPadItem.url = postmanItem.request.url.toString();

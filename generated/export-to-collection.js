@@ -189,6 +189,7 @@ function loadScratchPadCollection(inputFolder) {
     var yaml = fs.readFileSync(scratchPadCollectionFile).toString();
     var scratchPadCollection = YAML.parse(yaml);
     scratchPadCollection.items = [];
+    scratchPadCollection.name = utils.getFolderName(inputFolder);
     loadItemsRecursive(inputFolder, collectionFolderName, scratchPadCollection, scratchPadCollection);
     return scratchPadCollection;
 }
@@ -213,6 +214,8 @@ function loadItemsRecursive(inputFolder, collectionFolderName, scratchPadCollect
             console.log("Loading file: ".concat(current));
             var yaml = fs.readFileSync(current).toString();
             var scratchPadItem = YAML.parse(yaml);
+            scratchPadItem.name = utils.removeCounterPrefix(name);
+            scratchPadItem.name = utils.filenameWithoutExtension(scratchPadItem.name);
             parentScratchPadItem.items.push(scratchPadItem);
         }
     });

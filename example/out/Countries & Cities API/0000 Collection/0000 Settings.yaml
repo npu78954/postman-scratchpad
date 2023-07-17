@@ -1,5 +1,4 @@
 id: c70a2796-c865-42f0-b6d3-9ad9b0af6e9a
-name: Countries & Cities API
 auth:
   type: basic
   basic:

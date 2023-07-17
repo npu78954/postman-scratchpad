@@ -1,4 +1,5 @@
 import * as os from 'os';
+import * as path from 'path';
 
 export class Utilities {
 
@@ -33,5 +34,13 @@ export class Utilities {
 
   removeCounterPrefix(name: string): string {
     return name.substring(5);
+  }
+
+  filenameWithoutExtension(filename: string) {
+    return path.parse(filename).name;
+  }
+
+  getFolderName(folder: string) {
+    return path.parse(folder).name;
   }
 }

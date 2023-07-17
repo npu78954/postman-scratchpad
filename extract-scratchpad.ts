@@ -63,7 +63,6 @@ function saveCollectionSettings(collectionFolder: string, postmanCollection: Col
   fs.mkdirSync(folder);
   let scratchPadCollection: SCollection = {};
   scratchPadCollection.id = postmanCollection.id;
-  scratchPadCollection.name = postmanCollection.name;
   scratchPadCollection.auth = postmanCollection.auth;
 
   populateVariables(postmanCollection, scratchPadCollection);
@@ -138,7 +137,6 @@ function saveRequest(postmanItem: Item, folderPath: string, itemCounter: number)
   let counter: string = utils.getCounterPrefix(itemCounter);
   let scratchPadItem: SItem = {};
 
-  scratchPadItem.name = postmanItem.name;
   populateDescription(postmanItem, scratchPadItem);
   scratchPadItem.method = postmanItem.request.method;
   scratchPadItem.url = postmanItem.request.url.toString();

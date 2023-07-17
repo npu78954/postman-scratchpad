@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Utilities = void 0;
 var os = require("os");
+var path = require("path");
 var Utilities = /** @class */ (function () {
     function Utilities() {
     }
@@ -29,6 +30,12 @@ var Utilities = /** @class */ (function () {
     };
     Utilities.prototype.removeCounterPrefix = function (name) {
         return name.substring(5);
+    };
+    Utilities.prototype.filenameWithoutExtension = function (filename) {
+        return path.parse(filename).name;
+    };
+    Utilities.prototype.getFolderName = function (folder) {
+        return path.parse(folder).name;
     };
     return Utilities;
 }());

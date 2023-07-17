@@ -235,7 +235,7 @@ function loadScratchPadCollection(inputFolder: string): SCollection {
   let yaml = fs.readFileSync(scratchPadCollectionFile).toString();
   let scratchPadCollection: SCollection =  YAML.parse(yaml);
   scratchPadCollection.items = [];
-
+  scratchPadCollection.name = utils.getFolderName(inputFolder);
   loadItemsRecursive(inputFolder, collectionFolderName, scratchPadCollection, scratchPadCollection);
 
   return scratchPadCollection;
@@ -268,6 +268,8 @@ function loadItemsRecursive(inputFolder: string, collectionFolderName: string, s
       console.log(`Loading file: ${current}`);
       let yaml = fs.readFileSync(current).toString();
       let scratchPadItem: SItem = YAML.parse(yaml);
+      scratchPadItem.name = utils.removeCounterPrefix(name);
+      scratchPadItem.name = utils.filenameWithoutExtension(scratchPadItem.name);
       parentScratchPadItem.items.push(scratchPadItem);
 
     }
