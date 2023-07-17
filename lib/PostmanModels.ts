@@ -31,6 +31,7 @@ export interface PItem {
     disableUrlEncoding?: boolean
   }
   request?: PRequest
+  response?: PResponse
 }
 
 export interface PRequest {
@@ -39,6 +40,10 @@ export interface PRequest {
   body?: PBody
   url?: PUrl
   description?: string
+}
+
+export interface PResponse {
+
 }
 
 export interface PBody {

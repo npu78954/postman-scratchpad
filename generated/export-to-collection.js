@@ -11,10 +11,10 @@ function main(args) {
     var scratchPadCollection = loadScratchPadCollection(inputFolder);
     var postmanCollection = {};
     populateInfo(postmanCollection, scratchPadCollection);
+    populateItemsRecursive(postmanCollection, scratchPadCollection);
     populateAuth(postmanCollection, scratchPadCollection);
     populateEvents(postmanCollection, scratchPadCollection);
     populateVariables(postmanCollection, scratchPadCollection);
-    populateItemRecursive(postmanCollection, scratchPadCollection);
     saveCollection(outputCollection, postmanCollection);
     console.log("DONE");
 }
@@ -71,6 +71,91 @@ function populateVariables(postmanCollection, scratchPadCollection) {
         });
     });
 }
+function populateItemsRecursive(parentPostmanItem, parentScratchPadItem) {
+    parentScratchPadItem.items.forEach(function (scratchPadItem) {
+        if (scratchPadItem.items) {
+            console.log("Folder: ".concat(scratchPadItem.name));
+            var postmanItem = {
+                name: scratchPadItem.name,
+                item: []
+            };
+            if (!parentPostmanItem.item)
+                parentPostmanItem.item = [];
+            parentPostmanItem.item.push(postmanItem);
+            populateItemsRecursive(postmanItem, scratchPadItem);
+        }
+        else {
+            console.log("File: ".concat(scratchPadItem.name));
+            var postmanItem = {
+                name: scratchPadItem.name,
+                event: mapEvents(scratchPadItem),
+                protocolProfileBehavior: {
+                    disableUrlEncoding: true
+                },
+                request: mapRequest(scratchPadItem),
+                response: []
+            };
+            parentPostmanItem.item.push(postmanItem);
+        }
+    });
+}
+function mapEvents(scratchPadItem) {
+    var result = [];
+    if (scratchPadItem.prerequest) {
+        result.push({
+            listen: 'prerequest',
+            script: {
+                exec: populateEventExec(scratchPadItem.prerequest),
+                type: 'text/javascript',
+            }
+        });
+    }
+    if (scratchPadItem.tests) {
+        result.push({
+            listen: 'test',
+            script: {
+                exec: populateEventExec(scratchPadItem.tests),
+                type: 'text/javascript',
+            }
+        });
+    }
+    return result;
+}
+function mapRequest(scratchPadItem) {
+    var result = {
+        method: scratchPadItem.method,
+        header: []
+    };
+    scratchPadItem.headers.forEach(function (header) {
+        result.header.push({
+            key: header.key,
+            value: header.value,
+            type: 'default'
+        });
+    });
+    result.body = {
+        mode: 'raw',
+        raw: scratchPadItem.body,
+        options: {
+            raw: {
+                language: 'json'
+            }
+        }
+    };
+    result.url = mapUrl(scratchPadItem);
+    result.description = scratchPadItem.description;
+    return result;
+}
+function mapUrl(scratchPadItem) {
+    var url = {
+        raw: scratchPadItem.url
+    };
+    var host = scratchPadItem.url.split('/');
+    var parts = host.splice(1);
+    url.host = host;
+    url.path = parts;
+    return url;
+}
 function populateEvents(postmanCollection, scratchPadCollection) {
     postmanCollection.event = [];
     postmanCollection.event.push({
@@ -90,9 +175,11 @@ function populateEvents(postmanCollection, scratchPadCollection) {
 }
 function populateEventExec(content) {
     var result = [];
-    content.split('\n').forEach(function (line) {
-        result.push(line);
-    });
+    if (content) {
+        content.split('\n').forEach(function (line) {
+            result.push(line);
+        });
+    }
     return result;
 }
 function loadScratchPadCollection(inputFolder) {
@@ -114,7 +201,7 @@ function loadItemsRecursive(inputFolder, collectionFolderName, scratchPadCollect
         var isDir = fs.statSync(inputFolder + '/' + name).isDirectory();
         var current = inputFolder + '/' + name;
         if (isDir) {
-            console.log("Dir: ".concat(current));
+            console.log("Loading folder: ".concat(current));
             var scratchPadItem = {
                 name: utils.removeCounterPrefix(name),
                 items: []
@@ -123,17 +210,15 @@ function loadItemsRecursive(inputFolder, collectionFolderName, scratchPadCollect
             loadItemsRecursive(inputFolder + '/' + name, collectionFolderName, scratchPadCollection, scratchPadItem);
         }
         else {
+            console.log("Loading file: ".concat(current));
             var yaml = fs.readFileSync(current).toString();
             var scratchPadItem = YAML.parse(yaml);
             parentScratchPadItem.items.push(scratchPadItem);
-            console.log("File: ".concat(current));
         }
     });
 }
 function printUsage() {
     console.info('Usage: node export-to-collection.js [inputFolder] [outputCollection] ');
     console.info('Example: node export-to-collection.js ~/Postman/collections/ ~/Postman/collections/my.postman_collection.json');
-}
-function populateItemRecursive(postmanCollection, scratchPadCollection) {
 }
 //# sourceMappingURL=export-to-collection.js.map
