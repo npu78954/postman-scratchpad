@@ -30,4 +30,8 @@ export class Utilities {
   getCounterPrefix(itemCounter: number): string {
     return itemCounter.toString().padStart(2, '0') + '00 ';
   }
+
+  removeCounterPrefix(name: string): string {
+    return name.substring(5);
+  }
 }

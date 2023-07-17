@@ -5,6 +5,7 @@ export interface SCollection {
   variables?: SProperties[]
   prerequest?: string
   tests?: string
+  items?: SItem[]
 }
 
 export interface SProperties {
@@ -25,7 +26,7 @@ export interface SItem {
   url?: string
   headers?: SProperties[]
   method?: string
-  item?: SItem[]
+  items?: SItem[]
   prerequest?: string
   tests?: string
   auth?: SAuth

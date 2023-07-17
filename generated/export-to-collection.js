@@ -14,6 +14,7 @@ function main(args) {
     populateAuth(postmanCollection, scratchPadCollection);
     populateEvents(postmanCollection, scratchPadCollection);
     populateVariables(postmanCollection, scratchPadCollection);
+    populateItemRecursive(postmanCollection, scratchPadCollection);
     saveCollection(outputCollection, postmanCollection);
     console.log("DONE");
 }
@@ -95,13 +96,44 @@ function populateEventExec(content) {
     return result;
 }
 function loadScratchPadCollection(inputFolder) {
-    var collectionFolder = inputFolder + '/' + utils.getCounterPrefix(0) + 'Collection';
+    var collectionFolderName = utils.getCounterPrefix(0) + 'Collection';
+    var collectionFolder = inputFolder + '/' + collectionFolderName;
     var scratchPadCollectionFile = collectionFolder + '/' + utils.getCounterPrefix(0) + 'Settings.yaml';
     var yaml = fs.readFileSync(scratchPadCollectionFile).toString();
-    return YAML.parse(yaml);
+    var scratchPadCollection = YAML.parse(yaml);
+    scratchPadCollection.items = [];
+    loadItemsRecursive(inputFolder, collectionFolderName, scratchPadCollection, scratchPadCollection);
+    return scratchPadCollection;
+}
+function loadItemsRecursive(inputFolder, collectionFolderName, scratchPadCollection, parentScratchPadItem) {
+    var dirContent = fs.readdirSync(inputFolder);
+    dirContent.forEach(function (name) {
+        if (name === collectionFolderName) {
+            return;
+        }
+        var isDir = fs.statSync(inputFolder + '/' + name).isDirectory();
+        var current = inputFolder + '/' + name;
+        if (isDir) {
+            console.log("Dir: ".concat(current));
+            var scratchPadItem = {
+                name: utils.removeCounterPrefix(name),
+                items: []
+            };
+            parentScratchPadItem.items.push(scratchPadItem);
+            loadItemsRecursive(inputFolder + '/' + name, collectionFolderName, scratchPadCollection, scratchPadItem);
+        }
+        else {
+            var yaml = fs.readFileSync(current).toString();
+            var scratchPadItem = YAML.parse(yaml);
+            parentScratchPadItem.items.push(scratchPadItem);
+            console.log("File: ".concat(current));
+        }
+    });
 }
 function printUsage() {
     console.info('Usage: node export-to-collection.js [inputFolder] [outputCollection] ');
     console.info('Example: node export-to-collection.js ~/Postman/collections/ ~/Postman/collections/my.postman_collection.json');
+}
+function populateItemRecursive(postmanCollection, scratchPadCollection) {
 }
 //# sourceMappingURL=export-to-collection.js.map

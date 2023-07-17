@@ -27,6 +27,9 @@ var Utilities = /** @class */ (function () {
     Utilities.prototype.getCounterPrefix = function (itemCounter) {
         return itemCounter.toString().padStart(2, '0') + '00 ';
     };
+    Utilities.prototype.removeCounterPrefix = function (name) {
+        return name.substring(5);
+    };
     return Utilities;
 }());
 exports.Utilities = Utilities;

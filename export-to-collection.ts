@@ -3,7 +3,7 @@ import * as YAML from 'yaml';
 
 import {Utilities} from './lib/Utilities';
 import {PCollection} from './lib/PostmanModels';
-import {SCollection} from './lib/ScratchPadModels';
+import {SCollection, SItem} from './lib/ScratchPadModels';
 
 const utils = new Utilities();
 
@@ -21,6 +21,7 @@ function main(args:string[]) {
   populateAuth(postmanCollection, scratchPadCollection);
   populateEvents(postmanCollection, scratchPadCollection);
   populateVariables(postmanCollection, scratchPadCollection);
+
   saveCollection(outputCollection, postmanCollection);
 
   console.log("DONE");
@@ -127,11 +128,48 @@ function populateEventExec(content:string):string[] {
 
 function loadScratchPadCollection(inputFolder: string): SCollection {
 
-  let collectionFolder = inputFolder + '/' + utils.getCounterPrefix(0) + 'Collection';
+  let collectionFolderName = utils.getCounterPrefix(0) + 'Collection';
+  let collectionFolder = inputFolder + '/' + collectionFolderName;
   let scratchPadCollectionFile = collectionFolder + '/' + utils.getCounterPrefix(0) + 'Settings.yaml';
   let yaml = fs.readFileSync(scratchPadCollectionFile).toString();
+  let scratchPadCollection: SCollection =  YAML.parse(yaml);
+  scratchPadCollection.items = [];
 
-  return YAML.parse(yaml);
+  loadItemsRecursive(inputFolder, collectionFolderName, scratchPadCollection, scratchPadCollection);
+
+  return scratchPadCollection;
+}
+
+function loadItemsRecursive(inputFolder: string, collectionFolderName: string, scratchPadCollection: SCollection, parentScratchPadItem: any) {
+
+  let dirContent: string[] = fs.readdirSync(inputFolder);
+  dirContent.forEach(name => {
+
+    if (name === collectionFolderName) {
+      return;
+    }
+
+    let isDir: boolean = fs.statSync(inputFolder + '/' + name).isDirectory();
+    let current: string = inputFolder + '/' + name;
+    if (isDir) {
+
+      console.log(`Loading folder: ${current}`);
+      let scratchPadItem: SItem = {
+        name: utils.removeCounterPrefix(name),
+        items: []
+      }
+      parentScratchPadItem.items.push(scratchPadItem);
+      loadItemsRecursive(inputFolder + '/' + name, collectionFolderName, scratchPadCollection, scratchPadItem);
+
+    } else {
+
+      console.log(`Loading file: ${current}`);
+      let yaml = fs.readFileSync(current).toString();
+      let scratchPadItem: SItem = YAML.parse(yaml);
+      parentScratchPadItem.items.push(scratchPadItem);
+
+    }
+  });
 }
 
 function printUsage() {
@@ -139,3 +177,6 @@ function printUsage() {
   console.info('Usage: node export-to-collection.js [inputFolder] [outputCollection] ');
   console.info('Example: node export-to-collection.js ~/Postman/collections/ ~/Postman/collections/my.postman_collection.json');
 }
+
+
+
