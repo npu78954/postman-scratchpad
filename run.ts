@@ -51,13 +51,25 @@ function main(args:string[]) {
 }
 
 function logRequestResponse(args: any) {
+  if (args.request.headers && args.request.headers.members) {
+    logHighlighted(`\n\n  Request headers: `);
+    args.request.headers.members.forEach(header => {
+      logHighlightedNoLn(`  ${header.key}: ${header.value}`)
+    });
+  }
   if (args.request.body) {
-    let req: string = '\n  Request body: ' + args.request.body.raw.replace(/\n/g, '');
-    logRequestResponseBody(req);
+    let req: string = '\n\n  Request body: ' + args.request.body.raw.replace(/\n/g, '');
+    logHighlighted(req);
+  }
+  if (args.response.headers && args.response.headers.members) {
+    logHighlighted(`\n  Response headers: `);
+    args.response.headers.members.forEach(header => {
+      logHighlightedNoLn(`  ${header.key}: ${header.value}`)
+    });
   }
   if (args.response.stream) {
-    let resp: string = '  Response body: ' + args.response.stream.toString().replace(/\n/g, '') + '\n';
-    logRequestResponseBody(resp);
+    let resp: string = '\n\n  Response body: ' + args.response.stream.toString().replace(/\n/g, '') + '\n';
+    logHighlighted(resp);
   }
 }
 
@@ -70,16 +82,20 @@ function displaySummary(args: any) {
   }
 }
 
-function logError(errorMessage: string) {
-  process.stderr.write(`\x1b[31m${errorMessage}\x1b[0m\n`);
+function logError(message: string) {
+  process.stderr.write(`\x1b[31m${message}\x1b[0m\n`);
 }
 
-function logSuccess(errorMessage: string) {
-  process.stderr.write(`\x1b[32m${errorMessage}\x1b[0m\n`);
+function logSuccess(message: string) {
+  process.stdout.write(`\x1b[32m${message}\x1b[0m\n`);
 }
 
-function logRequestResponseBody(errorMessage: string) {
-  process.stderr.write(`\n\x1b[33m${errorMessage}\x1b[0m\n`);
+function logHighlighted(message: string) {
+  process.stdout.write(`\x1b[33m${message}\x1b[0m\n`);
+}
+
+function logHighlightedNoLn(message: string) {
+  process.stdout.write(`\x1b[33m${message}\x1b[0m`);
 }
 
 function loadInputCollectionParameter(args: string[]) {

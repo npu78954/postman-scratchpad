@@ -44,13 +44,25 @@ function main(args) {
     });
 }
 function logRequestResponse(args) {
+    if (args.request.headers && args.request.headers.members) {
+        logHighlighted("\n\n  Request headers: ");
+        args.request.headers.members.forEach(function (header) {
+            logHighlightedNoLn("  ".concat(header.key, ": ").concat(header.value));
+        });
+    }
     if (args.request.body) {
-        var req = '\n  Request body: ' + args.request.body.raw.replace(/\n/g, '');
-        logRequestResponseBody(req);
+        var req = '\n\n  Request body: ' + args.request.body.raw.replace(/\n/g, '');
+        logHighlighted(req);
+    }
+    if (args.response.headers && args.response.headers.members) {
+        logHighlighted("\n  Response headers: ");
+        args.response.headers.members.forEach(function (header) {
+            logHighlightedNoLn("  ".concat(header.key, ": ").concat(header.value));
+        });
     }
     if (args.response.stream) {
-        var resp = '  Response body: ' + args.response.stream.toString().replace(/\n/g, '') + '\n';
-        logRequestResponseBody(resp);
+        var resp = '\n\n  Response body: ' + args.response.stream.toString().replace(/\n/g, '') + '\n';
+        logHighlighted(resp);
     }
 }
 function displaySummary(args) {
@@ -62,14 +74,17 @@ function displaySummary(args) {
         logError(msg);
     }
 }
-function logError(errorMessage) {
-    process.stderr.write("\u001B[31m".concat(errorMessage, "\u001B[0m\n"));
+function logError(message) {
+    process.stderr.write("\u001B[31m".concat(message, "\u001B[0m\n"));
 }
-function logSuccess(errorMessage) {
-    process.stderr.write("\u001B[32m".concat(errorMessage, "\u001B[0m\n"));
+function logSuccess(message) {
+    process.stdout.write("\u001B[32m".concat(message, "\u001B[0m\n"));
 }
-function logRequestResponseBody(errorMessage) {
-    process.stderr.write("\n\u001B[33m".concat(errorMessage, "\u001B[0m\n"));
+function logHighlighted(message) {
+    process.stdout.write("\u001B[33m".concat(message, "\u001B[0m\n"));
+}
+function logHighlightedNoLn(message) {
+    process.stdout.write("\u001B[33m".concat(message, "\u001B[0m"));
 }
 function loadInputCollectionParameter(args) {
     var inputCollection = args[2];
