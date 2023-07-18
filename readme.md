@@ -10,9 +10,6 @@ Extract all requests from a postman collection so that they can be edited outsid
 *The collection settings extracted in YAML format*
 ![Example](./example/in/example3.png)
 
-*The same collection opened in Postman UI*
-![Example](./example/in/example2.png)
-
 *Request execution preview*
 ![Example](./example/in/example4.png)
 
