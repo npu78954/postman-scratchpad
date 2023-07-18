@@ -11,6 +11,8 @@
   "license": "ISC",
   "dependencies": {
     "@types/postman-collection": "^3.5.7",
+    "newman": "^5.3.2",
+    "newman-reporter-html": "^1.0.5",
     "postman-collection": "^4.1.7",
     "yaml": "^2.3.1"
   },

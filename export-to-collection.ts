@@ -246,7 +246,7 @@ function loadItemsRecursive(inputFolder: string, scratchPadCollection: SCollecti
   let dirContent: string[] = fs.readdirSync(inputFolder);
   dirContent.forEach(name => {
 
-    if (name === SETTINGS_FILE) {
+    if (name === SETTINGS_FILE || name.startsWith('.')) {
       return;
     }
 

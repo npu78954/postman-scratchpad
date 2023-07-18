@@ -195,7 +195,7 @@ function loadScratchPadCollection(inputFolder) {
 function loadItemsRecursive(inputFolder, scratchPadCollection, parentScratchPadItem) {
     var dirContent = fs.readdirSync(inputFolder);
     dirContent.forEach(function (name) {
-        if (name === SETTINGS_FILE) {
+        if (name === SETTINGS_FILE || name.startsWith('.')) {
             return;
         }
         var isDir = fs.statSync(inputFolder + '/' + name).isDirectory();
