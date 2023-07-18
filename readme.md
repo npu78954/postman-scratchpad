@@ -13,7 +13,7 @@ Extract all requests from a postman collection so that they can be edited outsid
 *The same collection opened in Postman UI*
 ![Example](./example/in/example2.png)
 
-*Requet execution preview*
+*Request execution preview*
 ![Example](./example/in/example4.png)
 
 ## Roadmap
