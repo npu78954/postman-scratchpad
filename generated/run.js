@@ -13,37 +13,62 @@ function main(args) {
     var environment = JSON.parse(fs.readFileSync(inputEnvironment).toString());
     newman.run({
         collection: collection,
-        reporters: 'html',
+        reporters: 'cli',
         reporter: {
-            html: {
-                export: './htmlResults.html'
-            }
+            cli: {
+                noSummary: true
+            },
         },
+        folder: 'Get population for unknown city',
         environment: environment,
         insecure: 'true'
     }, function (err) {
         if (err) {
             throw err;
         }
-        console.log('collection run complete!');
-    }).on('beforeItem', function (error, args) {
-        console.log('beforeItem');
-    }).on('beforeRequest', function (error, args) {
-        if (error) {
-            console.error(error);
-        }
-        else {
-            // Log the request body
-            console.log('beforeRequest');
-        }
     }).on('request', function (error, args) {
         if (error) {
-            console.error(error);
+            logError(error);
         }
         else {
-            console.log('sentRequest');
+            logRequestResponse(args);
+        }
+    }).on('done', function (error, args) {
+        if (error) {
+            logError(error);
+        }
+        else {
+            displaySummary(args);
         }
     });
+}
+function logRequestResponse(args) {
+    if (args.request.body) {
+        var req = '\n  Request body: ' + args.request.body.raw.replace(/\n/g, '');
+        logRequestResponseBody(req);
+    }
+    if (args.response.stream) {
+        var resp = '  Response body: ' + args.response.stream.toString().replace(/\n/g, '') + '\n';
+        logRequestResponseBody(resp);
+    }
+}
+function displaySummary(args) {
+    var msg = "\n  EXECUTIONS: ".concat(args.run.executions.length, " FAILURES: ").concat(args.run.failures.length, "\n");
+    if (args.run.failures.length === 0) {
+        logSuccess(msg);
+    }
+    else {
+        logError(msg);
+    }
+}
+function logError(errorMessage) {
+    process.stderr.write("\u001B[31m".concat(errorMessage, "\u001B[0m\n"));
+}
+function logSuccess(errorMessage) {
+    process.stderr.write("\u001B[32m".concat(errorMessage, "\u001B[0m\n"));
+}
+function logRequestResponseBody(errorMessage) {
+    process.stderr.write("\n\u001B[33m".concat(errorMessage, "\u001B[0m\n"));
 }
 function loadInputCollectionParameter(args) {
     var inputCollection = args[2];

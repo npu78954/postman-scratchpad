@@ -27,8 +27,8 @@
         "program": "${workspaceFolder}/run.ts",
         "args": [ "./example/in/Countries & Cities API.postman_collection2.json", "./example/in/countries_cities prod.postman_environment.json"  ],
         "preLaunchTask": "tsc: build - tsconfig.json",
-        "internalConsoleOptions": "openOnSessionStart",
-        "outFiles": ["${workspaceFolder}/generated/**/*.js"]
+        "outFiles": ["${workspaceFolder}/generated/**/*.js"],
+        "console": "integratedTerminal"
       }
     ]
   }
