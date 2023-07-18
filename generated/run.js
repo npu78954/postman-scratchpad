@@ -16,10 +16,11 @@ function main(args) {
         reporters: 'cli',
         reporter: {
             cli: {
-                noSummary: true
+                noSummary: true,
+                noBanner: true
             },
         },
-        folder: 'Get population for unknown city',
+        folder: 'Get single city and its population data',
         environment: environment,
         insecure: 'true'
     }, function (err) {

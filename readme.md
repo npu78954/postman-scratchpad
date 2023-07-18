@@ -13,6 +13,9 @@ Extract all requests from a postman collection so that they can be edited outsid
 *The same collection opened in Postman UI*
 ![Example](./example/in/example2.png)
 
+*Requet execution preview*
+![Example](./example/in/example4.png)
+
 ## Roadmap
 
 Hopefully, in the future, we will be able to run the extracted requests with [newman](https://github.com/postmanlabs/newman) and convert them back to a collection file.
